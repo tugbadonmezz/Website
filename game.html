@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Happy Birthday!</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        color: #333;
+      }
+      h1 {
+        color: #ff6f61;
+        font-size: 3rem;
+        text-align: center;
+      }
+      .timeline {
+        width: 80%;
+        margin: 20px auto;
+      }
+      .memory {
+        margin: 20px 0;
+        padding: 10px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .memory img {
+        max-width: 100%;
+        border-radius: 8px;
+      }
+      .easter-egg {
+        margin-top: 20px;
+        text-align: center;
+      }
+      .easter-egg button {
+        padding: 10px 20px;
+        background-color: #ff6f61;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .easter-egg button:hover {
+        background-color: #ff4436;
+      }
+      .game {
+        margin-top: 40px;
+        text-align: center;
+      }
+      .game button {
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .game button:hover {
+        background-color: #388e3c;
+      }
+      #game-board div {
+        width: 100px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 2rem;
+      }
+      #game-board {
+        display: grid;
+        grid-template-columns: repeat(4, 100px);
+        gap: 10px;
+        justify-content: center;
+      }
+      .hidden-message {
+        display: none;
+        font-size: 1.5rem;
+        color: #4caf50;
+      }
+    </style>
+ 
+    </div>
+    <div class="game">
+      <h2>Memory Matching Game</h2>
+      <p>Match the icons to reveal a special message!</p>
+      <button onclick="startGame()">Start Game</button>
+      <div id="game-board" style="display: none; margin-top: 20px"></div>
+      <p id="completion-message" class="hidden-message">
+        Congratulations! You've matched all the pairs. You deserve .......... 🎉
+      </p>
+    </div>
+    <script>
+      function showMessage() {
+        document.getElementById("hidden-message").style.display = "block";
+      }
+
+      function startGame() {
+        const gameBoard = document.getElementById("game-board");
+        const completionMessage = document.getElementById("completion-message");
+        completionMessage.style.display = "none";
+
+        gameBoard.style.display = "grid";
+        const icons = [
+          "🎂",
+          "🎁",
+          "🎉",
+          "🎈",
+          "🎂",
+          "🎁",
+          "🎉",
+          "🎈",
+          "🎶",
+          "🎵",
+          "⭐",
+          "🌟",
+          "🎶",
+          "🎵",
+          "⭐",
+          "🌟",
+        ];
+        const shuffledIcons = icons.sort(() => 0.5 - Math.random());
+
+        gameBoard.innerHTML = "";
+
+        shuffledIcons.forEach((icon, index) => {
+          const card = document.createElement("div");
+          card.textContent = "?";
+          card.dataset.icon = icon;
+          card.dataset.index = index;
+          card.addEventListener("click", () => revealCard(card));
+          gameBoard.appendChild(card);
+        });
+      }
+
+      let firstCard = null;
+      let secondCard = null;
+      let matchedPairs = 0;
+
+      function revealCard(card) {
+        if (card.textContent !== "?" || secondCard) return;
+
+        card.textContent = card.dataset.icon;
+        if (!firstCard) {
+          firstCard = card;
+        } else {
+          secondCard = card;
+          checkMatch();
+        }
+      }
+
+      function checkMatch() {
+        if (firstCard.dataset.icon === secondCard.dataset.icon) {
+          firstCard.style.backgroundColor = "#c8e6c9";
+          secondCard.style.backgroundColor = "#c8e6c9";
+          firstCard.removeEventListener("click", () => revealCard(firstCard));
+          secondCard.removeEventListener("click", () => revealCard(secondCard));
+          matchedPairs += 1;
+
+          if (matchedPairs === 8) {
+            document.getElementById("completion-message").style.display =
+              "block";
+          }
+
+          resetCards();
+        } else {
+          setTimeout(() => {
+            firstCard.textContent = "?";
+            secondCard.textContent = "?";
+            resetCards();
+          }, 1000);
+        }
+      }
+
+      function resetCards() {
+        firstCard = null;
+        secondCard = null;
+      }
+    </script>
+    <br />
+    <br />
+    <a href="game2.html" target="_self" title="WANT MORE?"> WANT MORE? </a>
+  </body>
+</html>

@@ -1,0 +1,187 @@
+<div class="it-takes-two-mini-game">
+  <h2>Mini Game: Collect the Hearts ❤️</h2>
+  <p>
+    Move the character to collect hearts and avoid obstacles! Use the arrow keys
+    to play.
+  </p>
+  <div id="game-container">
+    <div id="player"></div>
+    <div id="heart"></div>
+    <div id="obstacle"></div>
+  </div>
+  <p id="score">Score: 0</p>
+  <p id="game-message" style="display: none">
+    Game Over! Refresh the page to play again.
+  </p>
+</div>
+
+<style>
+  .it-takes-two-mini-game {
+    margin-top: 40px;
+    text-align: center;
+  }
+  #game-container {
+    width: 300px;
+    height: 300px;
+    background-color: #f4f4f9;
+    border: 2px solid #333;
+    position: relative;
+    overflow: hidden;
+    margin: 20px auto;
+  }
+  #player {
+    width: 30px;
+    height: 30px;
+    background-color: #ff6f61;
+    position: absolute;
+    top: 135px;
+    left: 135px;
+    border-radius: 50%;
+  }
+  #heart {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    background-color: #e91e63;
+    transform: rotate(-45deg);
+    transform-origin: center;
+    top: 0;
+    left: 0;
+  }
+
+  #heart:before,
+  #heart:after {
+    content: "";
+    width: 20px;
+    height: 20px;
+    background-color: #e91e63;
+    border-radius: 50%;
+    position: absolute;
+  }
+
+  #heart:before {
+    top: -10px;
+    left: 0;
+  }
+
+  #heart:after {
+    left: 10px;
+    top: 0;
+  }
+
+  #obstacle {
+    width: 20px;
+    height: 20px;
+    background-color: #333;
+    position: absolute;
+  }
+</style>
+
+<script>
+  const player = document.getElementById("player");
+  const heart = document.getElementById("heart");
+  const obstacle = document.getElementById("obstacle");
+  const scoreDisplay = document.getElementById("score");
+  const gameMessage = document.getElementById("game-message");
+  const gameContainer = document.getElementById("game-container");
+  let score = 0;
+  let gameOver = false;
+
+  // Player movement
+  document.addEventListener("keydown", (e) => {
+    if (gameOver) return;
+    const rect = player.getBoundingClientRect();
+    const containerRect = gameContainer.getBoundingClientRect();
+
+    switch (e.key) {
+      case "ArrowUp":
+        if (rect.top > containerRect.top)
+          player.style.top = `${rect.top - containerRect.top - 10}px`;
+        break;
+      case "ArrowDown":
+        if (rect.bottom < containerRect.bottom)
+          player.style.top = `${rect.top - containerRect.top + 10}px`;
+        break;
+      case "ArrowLeft":
+        if (rect.left > containerRect.left)
+          player.style.left = `${rect.left - containerRect.left - 10}px`;
+        break;
+      case "ArrowRight":
+        if (rect.right < containerRect.right)
+          player.style.left = `${rect.left - containerRect.left + 10}px`;
+        break;
+    }
+  });
+
+  // Randomize positions
+  function randomPosition(element) {
+    const containerRect = gameContainer.getBoundingClientRect();
+    const x = Math.floor(
+      Math.random() * (containerRect.width - element.offsetWidth)
+    );
+    const y = Math.floor(
+      Math.random() * (containerRect.height - element.offsetHeight)
+    );
+    element.style.left = `${x}px`;
+    element.style.top = `${y}px`;
+  }
+
+  // Check collision
+  function isCollision(rect1, rect2) {
+    return !(
+      rect1.right < rect2.left ||
+      rect1.left > rect2.right ||
+      rect1.bottom < rect2.top ||
+      rect1.top > rect2.bottom
+    );
+  }
+
+  // Game loop
+  function gameLoop() {
+    if (gameOver) return;
+    const playerRect = player.getBoundingClientRect();
+    const heartRect = heart.getBoundingClientRect();
+    const obstacleRect = obstacle.getBoundingClientRect();
+
+    // Check collision with heart
+    if (isCollision(playerRect, heartRect)) {
+      score++;
+      scoreDisplay.textContent = `Score: ${score}`;
+      randomPosition(heart);
+    }
+
+    // Check collision with obstacle
+    if (isCollision(playerRect, obstacleRect)) {
+      gameMessage.style.display = "block";
+      gameOver = true;
+    }
+
+    // Move obstacle
+    const containerRect = gameContainer.getBoundingClientRect();
+    let obstacleX = parseInt(obstacle.style.left || "0", 10);
+    let obstacleY = parseInt(obstacle.style.top || "0", 10);
+    obstacleX += (Math.random() < 0.5 ? -1 : 1) * 10;
+    obstacleY += (Math.random() < 0.5 ? -1 : 1) * 10;
+    obstacleX = Math.max(
+      0,
+      Math.min(containerRect.width - obstacle.offsetWidth, obstacleX)
+    );
+    obstacleY = Math.max(
+      0,
+      Math.min(containerRect.height - obstacle.offsetHeight, obstacleY)
+    );
+    obstacle.style.left = `${obstacleX}px`;
+    obstacle.style.top = `${obstacleY}px`;
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  // Initialize game
+  function startGame() {
+    randomPosition(heart);
+    randomPosition(obstacle);
+    gameLoop();
+  }
+
+  startGame();
+</script>
